@@ -1,3 +1,4 @@
+import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
@@ -5,16 +6,14 @@ export default class MyDocument extends Document {
   static getInitialProps({ renderPage }) {
     // custom document so styled-components can render CSS via SSR
     const sheet = new ServerStyleSheet();
-    const page = renderPage(App => props =>
-      sheet.collectStyles(<App {...props} />),
-    );
+    const page = renderPage(App => props => sheet.collectStyles(<App {...props} />));
     const styleTags = sheet.getStyleElement();
     return { ...page, styleTags };
   }
 
   render() {
     return (
-      <html>
+      <html lang="pt-BR">
         <Head>
           {this.props.styleTags}
           <link
@@ -25,6 +24,7 @@ export default class MyDocument extends Document {
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700"
             rel="stylesheet"
           />
+          <title>Desafio Winnin</title>
         </Head>
         <body>
           <Main />

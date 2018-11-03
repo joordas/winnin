@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "eslint src"
+    "pre-commit": "npm run build && eslint src"
   }
 }
