@@ -4,11 +4,11 @@ import config from './config';
 
 export const getListingsBySub = async ({ sub, type, params }) => {
   try {
+    const reqParams = stringify(params);
     const { redditDomain } = config;
-    const endpoint = `${redditDomain}/r/${sub}${type}.json?${params ||
-      ''}`;
+    const endpoint = `${redditDomain}/r/${sub}${type}.json?${reqParams
+      || ''}`;
     const res = await fetch(endpoint);
-    console.info('GET endpoint >>>>>>>>>>>', endpoint);
     const data = await res.json();
     return data;
   } catch (error) {
@@ -17,15 +17,16 @@ export const getListingsBySub = async ({ sub, type, params }) => {
   }
 };
 
-export const paginate = async ({ sub, type, count, after }) => {
+export const paginate = async ({
+  sub, type, count, after,
+}) => {
   const { fetchPerPage } = config;
   const params = {
     limit: fetchPerPage,
     count,
     after,
   };
-  const reqParams = stringify(params);
-  return getListingsBySub({ sub, type, params: reqParams });
+  return getListingsBySub({ sub, type, params });
 };
 
 export default getListingsBySub;

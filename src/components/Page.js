@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled, {
   createGlobalStyle,
   ThemeProvider,
 } from 'styled-components';
 import theme from './theme';
 import Menu from './Menu';
-import config from '../config';
+import config, { PageTitleHeader } from '../config';
 
 const Global = createGlobalStyle`
   html: {
@@ -16,38 +16,40 @@ const Global = createGlobalStyle`
     box-sizing: inherit;
   }
   body {
-    padding: 0;
     margin: 0;
+    padding: 0;
     font-size: 1.5rem;
     line-height: 2;
+    font-family: 'Roboto';
   }
   a {
     text-decoration: none;
     color: ${theme.black};
   }
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+  }
 `;
 
 const Inner = styled.div`
-  max-width: 600px;
+  max-width: ${theme.maxWidth};
   height: 100vh;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 20px;
 `;
 
-class Page extends Component {
-  render() {
-    return (
-      <ThemeProvider theme={theme}>
-        <Inner>
-          <Global />
-          <Menu tabs={config.categories} />
-          {this.props.children}
-        </Inner>
-      </ThemeProvider>
-    );
-  }
-}
+const Page = ({ pathname, children }) => (
+  <ThemeProvider theme={theme}>
+    <div>
+      <PageTitleHeader />
+      <Inner>
+        <Global />
+        <Menu tabs={config.categories} selected={pathname} />
+        {children}
+      </Inner>
+    </div>
+  </ThemeProvider>
+);
 
 export default Page;

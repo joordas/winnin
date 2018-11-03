@@ -1,25 +1,37 @@
 import React, { Component } from 'react';
 import pathOr from 'ramda/src/pathOr';
+import last from 'ramda/src/last';
 import { getListingsBySub, paginate } from '../apiClient';
 import ListingItem from './ListingItem';
 import Pagination from './Pagination';
+import config from '../config';
 
-class Listings extends Component {
+class Listing extends Component {
   state = {
-    sub: 'reactjs',
     data: [],
     after: null,
-    nextPage: 2,
     loadingContent: true,
+    endOfContent: false,
   };
 
+  async componentDidMount() {
+    const res = await this.getInitialData();
+    const data = pathOr([], ['data', 'data', 'children'], res);
+    // const after = pathOr(null, ['data', 'data', 'after'], res);
+    const after = data.length ? last(data).data.name : null;
+
+    this.setState({ data, after, loadingContent: false });
+  }
+
   async getInitialData() {
-    const type = this.props.listing || '/hot';
-    const { sub } = this.state;
+    const { listing } = this.props;
+    const type = listing || config.defaultListing;
+    const { defaultSub: sub } = config;
     try {
       const initialData = {
         type,
         sub,
+        params: { limit: config.initialPostsToFech },
       };
 
       const data = await getListingsBySub(initialData);
@@ -31,42 +43,58 @@ class Listings extends Component {
 
   async changePage() {
     this.setState({ loadingContent: true });
-    const type = this.props.listing || '/hot';
-    const { sub, data: items, nextPage: page } = this.state;
+    const { listing } = this.props;
+    const type = listing || '/hot';
+    const { defaultSub: sub } = config;
+    const { data: items } = this.state;
     const { data: currentData, after } = this.state;
     const count = items.length;
-    const res = await paginate({ sub, type, after, count });
+    const res = await paginate({
+      sub,
+      type,
+      after,
+      count,
+    });
+    if (pathOr([], ['data', 'children'], res).length === 0) {
+      return this.setState({
+        loadingContent: false,
+        endOfContent: true,
+      });
+    }
     const data = [
       ...currentData,
       ...pathOr([], ['data', 'children'], res),
     ];
-    console.log('data >>>>>>>>>>>', data);
-    this.setState(prevState => ({
+    return this.setState({
       data,
-      page: prevState.page + 1,
-      after: pathOr('', ['data', 'after'], res),
-    }));
-  }
-
-  async componentDidMount() {
-    const res = await this.getInitialData();
-    const data = pathOr([], ['data', 'data', 'children'], res);
-    const after = pathOr(null, ['data', 'data', 'after'], res);
-    this.setState({ data, after, loadingContent: false });
+      after: pathOr(data.last, ['data', 'after'], res),
+      loadingContent: false,
+    });
   }
 
   render() {
-    const { data } = this.state;
-    if (this.state.loadingContent) return <h1>loading</h1>;
+    const { data, loadingContent, endOfContent } = this.state;
     return (
       <>
-        {data.map(post => (
-          <ListingItem key={post.id} post={post.data} />
-        ))}
-        <Pagination paginate={this.changePage.bind(this)} />
+        {data.map((post) => {
+          if (!post.data) return null;
+          return <ListingItem key={post.data.id} post={post.data} />;
+        })}
+        {this.state.data.length === 0
+          && !this.state.loadingContent && (
+            <p>
+              Looks like nothing is rising fast enough in this
+              subreddit :(
+            </p>
+        )}
+        <Pagination
+          loading={loadingContent}
+          endOfContent={endOfContent}
+          paginate={this.changePage.bind(this)}
+        />
       </>
     );
   }
 }
 
-export default Listings;
+export default Listing;

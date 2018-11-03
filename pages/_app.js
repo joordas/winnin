@@ -3,7 +3,7 @@ import App, { Container } from 'next/app';
 import Page from '../src/components/Page';
 
 class CustomApp extends App {
-  static async getInitialProps({ Component, ctx }) {
+  static async getInitialProps({ Component, ctx, pathname }) {
     const pageProps = Component.getInitialProps
       ? await Component.getInitialProps(ctx)
       : {};
