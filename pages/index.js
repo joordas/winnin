@@ -1,26 +1,11 @@
 import React, { Component } from 'react';
-import Listings from '../src/components/Listings';
-import { getListingsBySub } from '../src/apiClient';
+import Listing from '../src/components/Listing';
 
 class Index extends Component {
-  static async getInitialProps() {
-    // try {
-    const initialData = {
-      sub: 'reactjs',
-      type: 'new',
-    };
-    const data = await getListingsBySub(initialData);
-    console.log(data);
-    return { data };
-    // } catch (error) {
-    console.error('>>', error);
-    // }
-  }
   render() {
-    const { initialData } = this.props;
     return (
       <div>
-        <Listings initialData={initialData} />
+        <Listing listing={'/hot'} />
       </div>
     );
   }

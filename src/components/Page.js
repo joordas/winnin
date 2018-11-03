@@ -4,6 +4,8 @@ import styled, {
   ThemeProvider,
 } from 'styled-components';
 import theme from './theme';
+import Menu from './Menu';
+import config from '../config';
 
 const Global = createGlobalStyle`
   html: {
@@ -40,6 +42,7 @@ class Page extends Component {
       <ThemeProvider theme={theme}>
         <Inner>
           <Global />
+          <Menu tabs={config.categories} />
           {this.props.children}
         </Inner>
       </ThemeProvider>

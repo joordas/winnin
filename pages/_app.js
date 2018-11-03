@@ -3,8 +3,12 @@ import App, { Container } from 'next/app';
 import Page from '../src/components/Page';
 
 class CustomApp extends App {
-  static getInitialProps() {
-    return {};
+  static async getInitialProps({ Component, ctx }) {
+    const pageProps = Component.getInitialProps
+      ? await Component.getInitialProps(ctx)
+      : {};
+
+    return { pageProps };
   }
 
   render() {
